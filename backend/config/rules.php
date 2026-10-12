@@ -20,7 +20,11 @@ return [
     'vehicle' => [
         'min_year' => 1990,
         'max_age_years' => 20,
+        // Верхняя граница валидации пробега: 0..max_mileage_km (REQ-MILEAGE-04).
         'max_mileage_km' => 500000,
+        // Порог решения по пробегу: выше — только approve переводится в review
+        // (REQ-MILEAGE-01/02); валидацию не меняет.
+        'review_max_mileage_km' => 400000,
     ],
 
     'amount' => [
