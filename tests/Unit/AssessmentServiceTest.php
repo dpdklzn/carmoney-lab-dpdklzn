@@ -24,18 +24,22 @@ final class AssessmentServiceTest extends TestCase
         $this->service = new AssessmentService(
             new ApplicationValidator($rules, new VinValidator($rules['vin']), $age),
             new LtvCalculator(),
-            new DecisionEngine($rules['ltv']),
+            new DecisionEngine([
+                'approve_max' => $rules['ltv']['approve_max'],
+                'review_max' => $rules['ltv']['review_max'],
+                'review_max_mileage_km' => 400000,
+            ]),
             $age,
         );
     }
 
     /** @return array<string,mixed> */
-    private function payload(int $amount, int $marketValue): array
+    private function payload(int $amount, int $marketValue, int $mileage = 96000): array
     {
         return [
             'vin' => 'XTA21099998765432',
             'year' => (int) date('Y') - 4,
-            'mileage' => 96000,
+            'mileage' => $mileage,
             'market_value' => $marketValue,
             'requested_amount' => $amount,
             'term_months' => 24,
@@ -68,5 +72,87 @@ final class AssessmentServiceTest extends TestCase
         self::assertSame(95.0, $result['ltv']);
         self::assertSame(DecisionEngine::REJECT, $result['decision']);
         self::assertSame(0, $result['approved_limit']);
+    }
+
+    public function testApprovesLowLtvWithMileageJustBelowThreshold(): void
+    {
+        $result = $this->service->assess($this->payload(450000, 900000, 399999));
+
+        self::assertSame(50.0, $result['ltv']);
+        self::assertSame(DecisionEngine::APPROVE, $result['decision']);
+    }
+
+    public function testApprovesLowLtvWithMileageExactlyAtThreshold(): void
+    {
+        $result = $this->service->assess($this->payload(450000, 900000, 400000));
+
+        self::assertSame(50.0, $result['ltv']);
+        self::assertSame(DecisionEngine::APPROVE, $result['decision']);
+    }
+
+    public function testSendsLowLtvToReviewWhenMileageJustAboveThreshold(): void
+    {
+        $result = $this->service->assess($this->payload(450000, 900000, 400001));
+
+        self::assertSame(50.0, $result['ltv']);
+        self::assertSame(DecisionEngine::REVIEW, $result['decision']);
+        self::assertSame(0, $result['approved_limit']);
+    }
+
+    public function testSendsLowLtvToReviewAtUpperMileageBoundary(): void
+    {
+        $result = $this->service->assess($this->payload(450000, 900000, 500000));
+
+        self::assertSame(50.0, $result['ltv']);
+        self::assertSame(DecisionEngine::REVIEW, $result['decision']);
+    }
+
+    public function testKeepsReviewWhenMileageAboveThresholdAndLtvInReviewZone(): void
+    {
+        $result = $this->service->assess($this->payload(630000, 900000, 400001));
+
+        self::assertSame(70.0, $result['ltv']);
+        self::assertSame(DecisionEngine::REVIEW, $result['decision']);
+    }
+
+    public function testKeepsRejectWhenMileageAboveThresholdAndLtvHigh(): void
+    {
+        $result = $this->service->assess($this->payload(810000, 900000, 400001));
+
+        self::assertSame(90.0, $result['ltv']);
+        self::assertSame(DecisionEngine::REJECT, $result['decision']);
+    }
+
+    public function testApprovesLowLtvWhenMileageIsEmptyString(): void
+    {
+        $payload = [
+            'vin' => 'XTA21099998765432',
+            'year' => (int) date('Y') - 4,
+            'mileage' => '',
+            'market_value' => 900000,
+            'requested_amount' => 450000,
+            'term_months' => 24,
+        ];
+
+        $result = $this->service->assess($payload);
+
+        self::assertSame(50.0, $result['ltv']);
+        self::assertSame(DecisionEngine::APPROVE, $result['decision']);
+        self::assertSame(450000, $result['approved_limit']);
+    }
+
+    public function testResultShapeIsUnchanged(): void
+    {
+        $result = $this->service->assess($this->payload(450000, 900000));
+
+        self::assertSame(
+            ['vehicle_age', 'ltv', 'decision', 'approved_limit', 'input'],
+            array_keys($result),
+        );
+        self::assertContains($result['decision'], [
+            DecisionEngine::APPROVE,
+            DecisionEngine::REVIEW,
+            DecisionEngine::REJECT,
+        ]);
     }
 }
