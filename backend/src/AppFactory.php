@@ -38,6 +38,7 @@ final class AppFactory
                 'approve_max' => $rules['ltv']['approve_max'],
                 'review_max' => $rules['ltv']['review_max'],
                 'review_max_mileage_km' => $rules['vehicle']['review_max_mileage_km'],
+                'max_age_years' => $rules['vehicle']['max_age_years'],
             ]),
             new VehicleAge((int) date('Y')),
         );
