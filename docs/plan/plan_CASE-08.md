@@ -2,10 +2,11 @@
 
 ID задачи: `CASE-08`. Основа: `docs/spec/spec_CASE-08.md` (REQ/AC),
 `docs/intent/intent_CASE-08.md`, утверждённые материалы
-`docs/sources/CASE-08.md` (постановщик, 2026-10-14). Этот файл — проекты
-issues для ДЗ 2.1: одна задача — один независимо проверяемый результат.
-GitHub issues, ветки, коммиты и push — следующим шагом; сейчас только
-документы и тела issues.
+`docs/sources/CASE-08.md` (постановщик, 2026-10-14). Этот файл содержит
+декомпозицию ДЗ 2.1 и тела опубликованных GitHub issues: одна задача — один
+независимо проверяемый результат. Issues созданы в личном учебном репозитории
+`dpdklzn/carmoney-lab-dpdklzn`. Реализация требований — следующий этап;
+публикация задач не означает прохождения их AC.
 
 Ограничения декомпозиции:
 
@@ -19,28 +20,47 @@ GitHub issues, ветки, коммиты и push — следующим шаг�
   (PHPUnit), прикладная проверка `curl` против `make up` (эндпоинты из
   спеки AC). Конкретные AC указаны в каждой задаче.
 
-## Таблица REQ → будущая issue
+## Опубликованные GitHub issues
+
+| Задача | GitHub issue | Размер |
+|---|---|---|
+| I-01 | [#11: [CASE-08] Обязательное поле equipment в валидации заявки](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/11) | size:S |
+| I-02 | [#12: [CASE-08] Расчёт залоговой стоимости по справочнику (таблицы скидок)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/12) | size:L |
+| I-03 | [#13: [CASE-08] LTV из залоговой стоимости справочника; approved_limit](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/13) | size:M |
+| I-04 | [#14: [CASE-08] Сверка пробега, года и комплектации; approve → review](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/14) | size:M |
+| I-05 | [#15: [CASE-08] Нет VIN, неполные данные и ошибка справочника → review](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/15) | size:M |
+| I-06 | [#16: [CASE-08] Таймаут справочника 1500 мс → review без оценки](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/16) | size:M |
+| I-07 | [#17: [CASE-08] Сохранение правила MILEAGE вместе со сверкой CASE-08](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/17) | size:S |
+| I-08 | [#18: [CASE-08] Контракт API: collateral_value, ltv, assessment_reasons, статусы](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/18) | size:M |
+| I-09 | [#19: [CASE-08] Хранение null-оценки: схема, миграция, сохранение записей](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/19) | size:M |
+| I-10 | [#20: [CASE-08] POST /api/applications: 201 с review и null-оценкой](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/20) | size:M |
+
+У каждой issue есть метка `epic:case-08`, одна метка `size:S/M/L`,
+обоснование размера, ссылки на REQ/AC и опубликованную спеку.
+Идентификаторы I-01…I-10 сохранены для связи с декомпозицией.
+
+## Таблица REQ → GitHub issue
 
 | REQ | Задача (issue) |
 |---|---|
-| REQ-CASE-08-01 | I-02 |
-| REQ-CASE-08-02 | I-02 |
-| REQ-CASE-08-03 | I-03 |
-| REQ-CASE-08-04 | I-03 |
-| REQ-CASE-08-05 | I-04 |
-| REQ-CASE-08-06 | I-04 |
-| REQ-CASE-08-07 | I-05 |
-| REQ-CASE-08-08 | I-05 |
-| REQ-CASE-08-09 | I-06 |
-| REQ-CASE-08-10 | I-03 |
-| REQ-CASE-08-11 | I-07 |
-| REQ-CASE-08-12 | I-08 |
-| REQ-CASE-08-13 | I-01 |
-| REQ-CASE-08-14 | I-09 |
-| REQ-CASE-08-15 | I-08 |
-| REQ-CASE-08-16 | I-08 |
-| REQ-CASE-08-17 | I-10 |
-| REQ-CASE-08-18 | I-05 |
+| REQ-CASE-08-01 | [I-02 (#12)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/12) |
+| REQ-CASE-08-02 | [I-02 (#12)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/12) |
+| REQ-CASE-08-03 | [I-03 (#13)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/13) |
+| REQ-CASE-08-04 | [I-03 (#13)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/13) |
+| REQ-CASE-08-05 | [I-04 (#14)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/14) |
+| REQ-CASE-08-06 | [I-04 (#14)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/14) |
+| REQ-CASE-08-07 | [I-05 (#15)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/15) |
+| REQ-CASE-08-08 | [I-05 (#15)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/15) |
+| REQ-CASE-08-09 | [I-06 (#16)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/16) |
+| REQ-CASE-08-10 | [I-03 (#13)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/13) |
+| REQ-CASE-08-11 | [I-07 (#17)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/17) |
+| REQ-CASE-08-12 | [I-08 (#18)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/18) |
+| REQ-CASE-08-13 | [I-01 (#11)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/11) |
+| REQ-CASE-08-14 | [I-09 (#19)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/19) |
+| REQ-CASE-08-15 | [I-08 (#18)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/18) |
+| REQ-CASE-08-16 | [I-08 (#18)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/18) |
+| REQ-CASE-08-17 | [I-10 (#20)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/20) |
+| REQ-CASE-08-18 | [I-05 (#15)](https://github.com/dpdklzn/carmoney-lab-dpdklzn/issues/15) |
 
 Пояснение распределения: REQ-16 (несохранение /api/ltv) проверяется в I-08
 вместе с составом ответа и статусами, чтобы AC-25/26/27/28 проверялись на
