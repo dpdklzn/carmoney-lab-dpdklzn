@@ -32,12 +32,12 @@ final class ApplicationValidator
 
         $year = (int) ($payload['year'] ?? 0);
         $age = $this->vehicleAge->inYears($year);
+        // Возраст старше max_age_years не ошибка валидации: такое авто
+        // доходит до DecisionEngine и получает reject (LOAN-12 П-3).
         if ($year < $this->rules['vehicle']['min_year']) {
             $errors['year'] = sprintf('Год выпуска не раньше %d', $this->rules['vehicle']['min_year']);
         } elseif ($age < 0) {
             $errors['year'] = 'Год выпуска не может быть в будущем';
-        } elseif ($age > $this->rules['vehicle']['max_age_years']) {
-            $errors['year'] = sprintf('Возраст авто больше %d лет', $this->rules['vehicle']['max_age_years']);
         }
 
         $mileage = (int) ($payload['mileage'] ?? -1);

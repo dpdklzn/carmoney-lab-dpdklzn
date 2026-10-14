@@ -18,13 +18,14 @@ final class DecisionEngineTest extends TestCase
             'approve_max' => 60.0,
             'review_max' => 85.0,
             'review_max_mileage_km' => 400000,
+            'max_age_years' => 20,
         ]);
     }
 
     #[DataProvider('ltvValues')]
     public function testDecidesByLtv(float $ltv, int $mileage, string $expected): void
     {
-        self::assertSame($expected, $this->engine->decide($ltv, $mileage));
+        self::assertSame($expected, $this->engine->decide($ltv, $mileage, 4));
     }
 
     /** @return array<string,array{float,int,string}> */
@@ -43,7 +44,7 @@ final class DecisionEngineTest extends TestCase
     #[DataProvider('mileageRules')]
     public function testAppliesMileageRule(int $mileage, float $ltv, string $expected): void
     {
-        self::assertSame($expected, $this->engine->decide($ltv, $mileage));
+        self::assertSame($expected, $this->engine->decide($ltv, $mileage, 4));
     }
 
     /** @return array<string,array{int,float,string}> */
@@ -57,6 +58,26 @@ final class DecisionEngineTest extends TestCase
             'пробег 400001 при среднем LTV — review сохраняется' => [400001, 70.0, DecisionEngine::REVIEW],
             'пробег 400001 при высоком LTV — reject сохраняет приоритет' => [400001, 90.0, DecisionEngine::REJECT],
             'пробег 0 при низком LTV — нижняя граница валидации' => [0, 50.0, DecisionEngine::APPROVE],
+        ];
+    }
+
+    #[DataProvider('vehicleAgeRules')]
+    public function testAppliesAgeRule(int $vehicleAge, float $ltv, int $mileage, string $expected): void
+    {
+        self::assertSame($expected, $this->engine->decide($ltv, $mileage, $vehicleAge));
+    }
+
+    /** @return array<string,array{int,float,int,string}> */
+    public static function vehicleAgeRules(): array
+    {
+        return [
+            'возраст 21 при низком LTV — reject независимо от LTV' => [21, 28.5, 96000, DecisionEngine::REJECT],
+            'возраст 21 при среднем LTV — reject' => [21, 72.3, 96000, DecisionEngine::REJECT],
+            'возраст 21 при высоком LTV — reject сохраняется' => [21, 120.0, 96000, DecisionEngine::REJECT],
+            'возраст 21 при пробеге выше порога — reject важнее перевода в review' => [21, 28.5, 400001, DecisionEngine::REJECT],
+            'возраст ровно 20 при низком LTV — граница включительная, решение по LTV' => [20, 28.5, 96000, DecisionEngine::APPROVE],
+            'возраст ровно 20 при высоком LTV — reject по LTV, не по возрасту' => [20, 120.0, 96000, DecisionEngine::REJECT],
+            'возраст 0 — нижняя граница, решение по LTV' => [0, 28.5, 96000, DecisionEngine::APPROVE],
         ];
     }
 }

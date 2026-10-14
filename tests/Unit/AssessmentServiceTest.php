@@ -28,17 +28,18 @@ final class AssessmentServiceTest extends TestCase
                 'approve_max' => $rules['ltv']['approve_max'],
                 'review_max' => $rules['ltv']['review_max'],
                 'review_max_mileage_km' => 400000,
+                'max_age_years' => $rules['vehicle']['max_age_years'],
             ]),
             $age,
         );
     }
 
     /** @return array<string,mixed> */
-    private function payload(int $amount, int $marketValue, int $mileage = 96000): array
+    private function payload(int $amount, int $marketValue, int $mileage = 96000, ?int $year = null): array
     {
         return [
             'vin' => 'XTA21099998765432',
-            'year' => (int) date('Y') - 4,
+            'year' => $year ?? (int) date('Y') - 4,
             'mileage' => $mileage,
             'market_value' => $marketValue,
             'requested_amount' => $amount,
@@ -139,6 +140,35 @@ final class AssessmentServiceTest extends TestCase
         self::assertSame(50.0, $result['ltv']);
         self::assertSame(DecisionEngine::APPROVE, $result['decision']);
         self::assertSame(450000, $result['approved_limit']);
+    }
+
+    public function testRejectsOldVehicleRegardlessOfLowLtv(): void
+    {
+        $result = $this->service->assess($this->payload(450000, 900000, 96000, (int) date('Y') - 22));
+
+        self::assertSame(50.0, $result['ltv']);
+        self::assertSame(DecisionEngine::REJECT, $result['decision']);
+        self::assertSame(0, $result['approved_limit']);
+        self::assertSame(22, $result['vehicle_age']);
+    }
+
+    public function testApprovesLowLtvAtExactAgeBoundary(): void
+    {
+        $result = $this->service->assess($this->payload(450000, 900000, 96000, (int) date('Y') - 20));
+
+        self::assertSame(50.0, $result['ltv']);
+        self::assertSame(DecisionEngine::APPROVE, $result['decision']);
+        self::assertSame(450000, $result['approved_limit']);
+        self::assertSame(20, $result['vehicle_age']);
+    }
+
+    public function testKeepsRejectForOldVehicleWhenLtvAlsoRejects(): void
+    {
+        $result = $this->service->assess($this->payload(855000, 900000, 96000, (int) date('Y') - 22));
+
+        self::assertSame(95.0, $result['ltv']);
+        self::assertSame(DecisionEngine::REJECT, $result['decision']);
+        self::assertSame(0, $result['approved_limit']);
     }
 
     public function testResultShapeIsUnchanged(): void
